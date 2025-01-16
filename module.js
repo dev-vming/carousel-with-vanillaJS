@@ -33,14 +33,15 @@ export default function makeCarousel(itemList) {
 
   // itemList가 있는 경우 새로 아이템을 만들어서 추가
   if (itemList) {
+    itemList = [...itemList.splice(-1), ...itemList];
     itemList.forEach((item) => {
       addImageItem(itemContainer, item);
     });
   } else {
     // 없을 경우 기존과 동일하게 동작
+    addImageItem(itemContainer, "./images/05.jpg");
     addImageItem(itemContainer, "./images/01.jpg");
     addImageItem(itemContainer, "./images/02.jpg");
-    addImageItem(itemContainer, "./images/03.jpg");
     addImageItem(itemContainer, "./images/04.jpg");
   }
 
