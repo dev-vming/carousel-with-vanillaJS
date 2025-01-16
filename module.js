@@ -1,7 +1,8 @@
 export default function makeCarousel(
   itemList,
   visibleCount = 1,
-  slideCount = 1
+  slideCount = 1,
+  captionPos = 'center middle',
 ) {
   const iconNext = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
   <path color="white" stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
@@ -166,6 +167,18 @@ export default function makeCarousel(
     position: absolute;
     filter: drop-shadow(3px 3px 3px rgb(0 0 0 / 0.5));
     `;
+
+    if (captionPos.includes('left')) {
+      caption.style.left = '10%';
+    } else if (captionPos.includes('right')) {
+      caption.style.right = '10%';
+    }
+
+    if (captionPos.includes('top')) {
+      caption.style.top = '20%';
+    } else if (captionPos.includes('bottom')) {
+      caption.style.bottom = '20%';
+    }
 
     return container;
   }

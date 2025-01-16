@@ -31,7 +31,7 @@ app.appendChild(makeCarousel([
   './images/11.jpg',
   './images/12.jpg',
   './images/13.jpg',
-]))
+],1,1,'left'))
 
 // 여러 장이 보이는 캐러셀 동작
 app.appendChild(createElement({
@@ -62,4 +62,4 @@ app.appendChild(makeCarousel([
   './images/13.jpg',
   './images/14.jpg',
   './images/15.jpg',
-],4,2))
+],4,2,'right bottom'))
