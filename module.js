@@ -1,4 +1,4 @@
-export default function makeCarousel(itemList) {
+export default function makeCarousel(itemList, visibleCount = 1) {
   const iconNext = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
   <path color="white" stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
 </svg>
@@ -7,6 +7,9 @@ export default function makeCarousel(itemList) {
   <path color="white" stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
 </svg>
 `;
+
+  const itemWidth = Math.trunc(700 / visibleCount);
+
   const wrapper = createElement({
     tagName: "div",
   });
@@ -28,12 +31,11 @@ export default function makeCarousel(itemList) {
 
   itemContainer.style.cssText = `
   display: flex;
-  transform: translateX(-700px)
+  transform: translateX(0px)
   `;
 
   // itemList가 있는 경우 새로 아이템을 만들어서 추가
   if (itemList) {
-    itemList = [...itemList.splice(-1), ...itemList];
     itemList.forEach((item) => {
       addImageItem(itemContainer, item);
     });
@@ -83,16 +85,27 @@ export default function makeCarousel(itemList) {
   }
 
   function handleSlide(next = true) {
+    if (next) {
+      itemContainer.appendChild(itemContainer.firstChild.cloneNode(true));
+    } else {
+      itemContainer.prepend(itemContainer.lastChild.cloneNode(true));
+      itemContainer.style.transform = `translateX(${-itemWidth}px)`;
+    }
+
+    setTimeout(() => {handleTransitionEnd(next)}, 0);
+  }
+
+  function handleTransitionEnd(next) {
     itemContainer.style.transitionDuration = "0.5s";
-    itemContainer.style.transform = `translateX(${next ? -1400 : 0}px)`;
+    itemContainer.style.transform = `translateX(${next ? -itemWidth : 0}px)`;
 
     itemContainer.ontransitionend = () => {
       itemContainer.style.removeProperty("transition-duration");
-      itemContainer.style.transform = "translateX(-700px)";
+      itemContainer.style.transform = `translateX(0px)`;
 
       next
-        ? itemContainer.appendChild(itemContainer.firstChild)
-        : itemContainer.prepend(itemContainer.lastChild);
+        ? itemContainer.firstChild.remove()
+        : itemContainer.lastChild.remove();
     };
   }
 
@@ -102,13 +115,13 @@ export default function makeCarousel(itemList) {
       parent,
     });
     container.style.cssText = `
-    width: 700px;
+    width: ${itemWidth}px;
     height: 250px;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    background-color: #000;
+    background-color: #0001;
     position: relative;
     `;
 
@@ -117,6 +130,9 @@ export default function makeCarousel(itemList) {
       parent: container,
       properties: { src },
     });
+    image.style.cssText = `
+    width: 100%;
+    `;
 
     const caption = createElement({
       tagName: "span",
