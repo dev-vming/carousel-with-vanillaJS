@@ -1,4 +1,8 @@
-export default function makeCarousel(itemList, visibleCount = 1) {
+export default function makeCarousel(
+  itemList,
+  visibleCount = 1,
+  slideCount = 1
+) {
   const iconNext = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
   <path color="white" stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
 </svg>
@@ -85,27 +89,40 @@ export default function makeCarousel(itemList, visibleCount = 1) {
   }
 
   function handleSlide(next = true) {
-    if (next) {
-      itemContainer.appendChild(itemContainer.firstChild.cloneNode(true));
-    } else {
-      itemContainer.prepend(itemContainer.lastChild.cloneNode(true));
-      itemContainer.style.transform = `translateX(${-itemWidth}px)`;
+    for (let i = 0; i < slideCount; ++i) {
+      if (next) {
+        const idx = i % itemContainer.children.length;
+        itemContainer.appendChild(itemContainer.children[idx].cloneNode(true));
+      } else {
+        const idx = itemContainer.children.length - i - 1;
+        itemContainer.prepend(itemContainer.children[idx].cloneNode(true));
+      }
     }
+    next ||
+      (itemContainer.style.transform = `translateX(${
+        -itemWidth * slideCount
+      }px)`);
 
-    setTimeout(() => {handleTransitionEnd(next)}, 0);
+    setTimeout(() => {
+      handleTransitionEnd(next);
+    }, 0);
   }
 
   function handleTransitionEnd(next) {
     itemContainer.style.transitionDuration = "0.5s";
-    itemContainer.style.transform = `translateX(${next ? -itemWidth : 0}px)`;
+    itemContainer.style.transform = `translateX(${
+      next ? -itemWidth * slideCount : 0
+    }px)`;
 
     itemContainer.ontransitionend = () => {
+      for (let i = 0; i < slideCount; ++i) {
+        next
+          ? itemContainer.firstChild.remove()
+          : itemContainer.lastChild.remove();
+      }
+
       itemContainer.style.removeProperty("transition-duration");
       itemContainer.style.transform = `translateX(0px)`;
-
-      next
-        ? itemContainer.firstChild.remove()
-        : itemContainer.lastChild.remove();
     };
   }
 
@@ -130,9 +147,12 @@ export default function makeCarousel(itemList, visibleCount = 1) {
       parent: container,
       properties: { src },
     });
-    image.style.cssText = `
-    width: 100%;
+
+    if (visibleCount > 1 || slideCount > 1) {
+      image.style.cssText = `
+    height: 100%;
     `;
+    }
 
     const caption = createElement({
       tagName: "span",
